@@ -6,6 +6,7 @@ import { Link } from "react-router-native";
 import { ME } from "../graphql/queries";
 import SignOut from "./SignOut";
 import { useQuery } from "@apollo/client/react";
+import useMe from "../hooks/useMe";
 
 const styles = StyleSheet.create({
   container: {
@@ -22,9 +23,7 @@ const styles = StyleSheet.create({
 });
 
 const AppBar = () => {
-  const { data, error, loading } = useQuery(ME, {
-    fetchPolicy: "cache-and-network",
-  });
+  const [data, loading] = useMe()
   if (loading) return;
 
   return (
@@ -36,6 +35,14 @@ const AppBar = () => {
         {data.me ? <SignOut/> : 
         <Link to="/signIn">
           <Text color="textSecondary">Sign In</Text>
+        </Link>}
+        {data.me ? <Link to="/review">
+          <Text color="textSecondary">Create review</Text>
+        </Link> : <Link to="/signUp">
+          <Text color="textSecondary">Sign Up</Text>
+        </Link>}
+        {data.me && <Link to="/userReviews">
+          <Text color="textSecondary">My Reviews</Text>
         </Link>}
       </ScrollView>
     </View>

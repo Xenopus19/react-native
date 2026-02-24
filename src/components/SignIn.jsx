@@ -72,7 +72,7 @@ const SignIn = ({ onSubmit }) => {
       {formik.touched.password && formik.errors.password && (
         <Text style={{ color: "red" }}>{formik.errors.password}</Text>
       )}
-      <Pressable style={styles.button} onPress={formik.handleSubmit}>
+      <Pressable testID="signInButton" style={styles.button} onPress={formik.handleSubmit}>
         <Text style={styles.buttonText}>Sign In</Text>
       </Pressable>
     </View>

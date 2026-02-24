@@ -1,16 +1,10 @@
 import { FlatList, View, StyleSheet } from "react-native";
-import RepositoryItem from "./RepositoryItem";
+import RepositoryItem from "../RepositoryItem";
 import { useEffect, useState } from "react";
-import useRepositories from "../hooks/useRepositories";
-
-const styles = StyleSheet.create({
-  separator: {
-    height: 15,
-  },
-  list: {
-    backgroundColor: "#e4e5ee",
-  },
-});
+import useRepositories from "../../hooks/useRepositories";
+import RepositoryListContainer from "./RepositoryListContainer";
+import OrderSelector from "./OrderSelector";
+import { useDebounce } from 'use-debounce';
 
 const repositories = [
   {
@@ -59,22 +53,21 @@ const repositories = [
   },
 ];
 
-const ItemSeparator = () => <View style={styles.separator} />;
-
 const RepositoryList = () => {
-  const { repositories } = useRepositories();
-  
-  const repositoryNodes = repositories
-    ? repositories.edges.map(edge => edge.node)
-    : [];
+  const [order, setOrder] = useState({orderBy: 'CREATED_AT', orderDirection: 'DESC'});
+  const [keyword, setKeyword] = useState('')
+  const [debouncedKeyword] = useDebounce(keyword, 2000)
+  const { repositories, fetchMore } = useRepositories(order, debouncedKeyword);
+
+  const onEndReach = () => {
+    fetchMore()
+  }
 
   return (
-    <FlatList
-      data={repositoryNodes}
-      ItemSeparatorComponent={ItemSeparator}
-      renderItem={({ item }) => <RepositoryItem repository={item} />}
-      keyExtractor={(item) => item.id}
-    />
+    <View style={{ flex: 1 }}>
+      <OrderSelector setKeyword={setKeyword} setOrder={setOrder} order={order}/>
+      <RepositoryListContainer onEndReach={onEndReach} repositories={repositories}/>
+    </View>
   );
 };
 
